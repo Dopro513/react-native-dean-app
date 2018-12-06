@@ -9,11 +9,13 @@ import {
 
 const {width, height} = Dimensions.get('window')
 export default class Cell extends Component {
+
   constructor(props){
     super(props);
   }
+
   render(){
-    console.log(this.props.item)
+    console.log('item',this.props.item)
     return(
         <Image source={this.props.item.img} style={{height:(width-10)/3, width:(width-10)/3, resizeMode:'contain'}}>
           <View style={{flex:1, flexDirection:'row', alignItems:'center'}}>

@@ -284,6 +284,32 @@ export default class ProfileScreen extends Component {
     return output;
   }
 
+  selectCell = (item) => {
+    console.log(item)
+  }
+
+  collectionCell = (item) => {
+    console.log(item)
+    return(
+      <View>
+        <Image source={item.img} style={{height:(width-10)/3, width:(width-10)/3, resizeMode:'contain'}}>
+          <View style={{flex:1, flexDirection:'row', alignItems:'center'}}>
+            <View style={{flex:1,alignItems:'center'}}>
+              <View style={{flexDirection:'row', flex:0.5,}}>
+                <View style={{flex:1, justifyContent:'flex-end', flexDirection:'row'}}>
+                  <Image source={item.thumb} style={{width:20, height:20, marginTop:10, resizeMode:'contain'}}/>
+                  <TouchableOpacity style={{alignItems:'center', width:20, height:20, marginTop:10, justifyContent:'center'}}>
+                    <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:15, height:15}}/>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Image>
+      </View>
+    )
+  }
+
   render() {
     return (
 
@@ -364,7 +390,7 @@ export default class ProfileScreen extends Component {
                       <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.age} </Text>
                       <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.location?this.state.user.location:''} </Text>
                 
-                      {this.state.user.type.name != 'Fan' ?<Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.status?this.state.user.status:'Signed'} </Text>:<View/>}
+                      {this.state.user.type.name != 'Fan' && this.state.user.type.name != 'Business' ?<Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.status?this.state.user.status:'Signed'} </Text>:<View/>}
                     </View>
                   </View>
                 </View>
@@ -494,7 +520,7 @@ export default class ProfileScreen extends Component {
                   <TouchableOpacity onPress={() => this.setState({collection:2})}><Image source={this.state.collection==2?require('../assets/images/sel_users.png'):require('../assets/images/users.png')} style={{width:25, height:25, resizeMode:'contain'}}/></TouchableOpacity>
                 </View>
                 <View style={{height:width}}>
-                  <CollectionView component={Cell}
+                  <CollectionView component={this.collectionCell}
                     dataSource={dataSource}
                     selectionMode={false}
                     cellSize={

@@ -537,7 +537,7 @@ export default class EditProfile extends Component {
                   this.state.selectedRole.name != 'Fan' ? <View style={{height:20}}/>:<View/>
                 }
                 {
-                  this.state.selectedRole.name != 'Fan' ?
+                  this.state.selectedRole.name != 'Fan' && this.state.selectedRole.name != 'Business' ?
                   <View style={{backgroundColor:'rgb(245,245,245)', height:40, flexDirection:'row'}}>
                     <TouchableOpacity style={{flex:1, height:40}} onPress={() => this.setState({stateVisuble:!this.state.stateVisuble})}>
                       <View style={{flexDirection:'row', height:40, marginLeft:20, marginRight:20, alignItems:'center'}}>

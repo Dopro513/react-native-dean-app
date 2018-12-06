@@ -386,7 +386,7 @@ export default class OtherProfile extends Component {
                   <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.age} </Text>
                   <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.location?this.state.user.location:''} </Text>
                   <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.distance} mls</Text>
-                  {this.state.user.type.name != 'Fan' ? <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.status?this.state.user.status:'Signed'} </Text>:<View/>}
+                  {this.state.user.type.name != 'Fan' && this.state.user.type.name != 'Business' ? <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.status?this.state.user.status:'Signed'} </Text>:<View/>}
                 </View>
               </View>
             </View>

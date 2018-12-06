@@ -93,7 +93,7 @@ export default class LoginScreen extends Component {
       following:0,
       feedback:0,
       bio:'',
-      status:'Signed',
+      status:'Independent',
       location: 'London',
       username: userData.first_name+' '+userData.last_name
     }
