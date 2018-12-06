@@ -14,6 +14,13 @@ import {
   ScrollView,
   ART,
 } from 'react-native'
+import Menu, {
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+  renderers
+} from 'react-native-popup-menu'
 import moment from 'moment'
 import Swiper from 'react-native-swiper'
 import Drawer from 'react-native-drawer'
@@ -24,7 +31,7 @@ import Cell from '../components/collectionCell'
 
 import CircleImage from '../components/circleImage'
 import FacebookImage from '../components/facebookImage'
-import Menu from './menu'
+import DrawerMenu from './menu'
 import BackButton from '../components/backButton'
 import RatingView from '../components/ratingView'
 import GenreView from '../components/genreView'
@@ -94,12 +101,37 @@ export default class OtherProfile extends Component {
     age:'',
     fontLoaded:'',
     distance:0,
+    connected:false,
+    fromChat:this.props.navigation.state.params.fromChat,
   }
 
+  componentWillUnmount() {
+    this._mounted = false;
+    
+  } 
   componentWillMount() {
+    this._mounted = true;
     this.fontLoad()
     this.fetchUser()
     this.calDistance()
+
+    firebase.database().ref('relationships').child(this.state.currentUser.uid).on('value', (snap) => {
+      if(!this._mounted) return
+      var relation = snap.val()
+      var liked = relation.liked||{}
+      var likedBack = relation.likedBack||{}
+      
+      var swiped = this.state.userId in liked
+      var swiped1 = this.state.userId in likedBack
+
+      if(swiped && swiped1) {
+        console.log('connected')
+        this.setState({
+          connected:true,
+        })
+      }
+      
+    })
   }
 
   calDistance = () => {
@@ -122,18 +154,27 @@ export default class OtherProfile extends Component {
     var lat2 = this.b.l[0]
     var lon1 = this.a.l[1]
     var lon2 = this.b.l[1]
-
-    var distance = geolib.getDistanceSimple({latitude:lat1, longitude:lon1}, {latitude:lat2, longitude:lon2})/1609.34
-
-    this.setState({
-      distance:distance.toFixed(0)
-    })
+    if(this.state.currentUser.unit == 'Mi') {
+      var distance = geolib.getDistanceSimple({latitude:lat1, longitude:lon1}, {latitude:lat2, longitude:lon2})/1609.34
+      
+      this.setState({
+        distance:distance.toFixed(0)
+      })
+    } else {
+      var distance = geolib.getDistanceSimple({latitude:lat1, longitude:lon1}, {latitude:lat2, longitude:lon2})/1000
+      
+      this.setState({
+        distance:distance.toFixed(0)
+      })
+    }
+    
   }
 
   fetchUser = async () => {
     console.log('fetch data')
     firebase.database().ref('users').child(this.state.userId).on('value', (snap) => {
       console.log(snap.val())
+      if(!this._mounted) return
       user = snap.val()
       var userBirthday = moment(user.birthday, 'MM/DD/YYYY')
       var userAge = moment().diff(userBirthday, 'years')
@@ -143,6 +184,17 @@ export default class OtherProfile extends Component {
         age: userAge,
       })
     })
+
+
+    firebase.database().ref('profile').child(this.state.userId).on('value', (snap) => {
+      console.log('profile',snap.val())
+      if(!this._mounted) return
+      var img = snap.val()
+      if (img == null) return
+      this.setState({
+        image: img.URL,
+      })
+    })        
   }
 
   closeDrawer = () => {
@@ -301,13 +353,51 @@ export default class OtherProfile extends Component {
     return output;
   }
 
+  goChat = () => {
+    if(this.state.fromChat){
+      this.props.navigation.goBack()
+      return
+    }
+    firebase.database().ref('relationships').child(this.state.currentUser.uid).on('value', (snap) => {
+      var relation = snap.val()
+      var liked = relation.liked||{}
+      var likedBack = relation.likedBack||{}
+      
+      var swiped = this.state.user.uid in liked
+      var swiped1 = this.state.user.uid in likedBack
+      if(swiped && swiped1) {
+        this.props.navigation.navigate('Chat', {user:this.state.currentUser, profile:this.state.user,})
+      }
+
+      
+      if (swiped1 && !swiped) {
+        firebase.database().ref('notifications').child(this.state.currentUser.uid).on('value', (snap)=> {
+          var keyArr = _.keys( snap.val())||[]
+          var valArr = _.values(snap.val())||[]
+          for(var i=0; i<valArr.length;i++) {
+            if(valArr[i].user.uid == this.state.user.uid) {
+              this.props.navigation.navigate('Chat', {user:this.state.currentUser, profile:this.state.user, accepted:!valArr[i].readed, notificationID:keyArr[i]})
+              break
+            }
+          }
+        })
+      }
+
+      if(!swiped && !swiped1) {
+        this.props.navigation.navigate('Chat', {user:this.state.currentUser, profile:this.state.user, invited:true})
+      }
+      
+    })
+    
+  }
+
   render() {
     return (
       <Drawer
         ref={(ref) => this._drawer = ref}
         type="static"
         content={
-          <Menu closeDrawer={this.closeDrawer} />
+          <DrawerMenu closeDrawer={this.closeDrawer} />
         }
         acceptDoubleTap
         styles={{main: {shadowColor: '#000000', shadowOpacity: 0.3, shadowRadius: 15}}}
@@ -332,6 +422,7 @@ export default class OtherProfile extends Component {
         >
         {
           this.state.user!=null && this.state.fontLoaded ?
+          <MenuContext style={{flex:1}}>
           <View style={{backgroundColor: 'rgb(83, 83, 83)', flex:1}}>
 
           <View style={{flexDirection: 'row', height:70, backgroundColor: 'rgb(83, 83, 83)'}}>
@@ -341,22 +432,50 @@ export default class OtherProfile extends Component {
                 <View style={{flex:1, height:50, marginTop:20, alignItems:'center', justifyContent:'center'}}>
                     <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> {this.state.user.username?this.state.user.username:''} </Text>
                 </View>
-                <TouchableOpacity style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
-                  <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:20, height:20}}/>
-                </TouchableOpacity>
+                
+                <View style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
+                <Menu>
+                    <MenuTrigger>
+                    <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:20, height:20}}/>
+                    </MenuTrigger>
+                    <MenuOptions style={{}} >
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Share</Text>
+                      </MenuOption>
+                      
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Credit</Text>
+                      </MenuOption>
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Licence</Text>
+                      </MenuOption>
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Report</Text>
+                      </MenuOption>
+                      
+                    </MenuOptions>
+                  </Menu>
+                </View>
             </View>
           <View style={{flex:1, backgroundColor:'white'}}>
             <ScrollView>
-            <FacebookImage width={width} height={width} imageURI={this.state.image} facebookID={this.state.user.id} size={width}>
+            <FacebookImage width={width} height={width} imageURI={this.state.user.imgURL} facebookID={this.state.user.id} size={width}>
               {
                 this.state.user.type.name != 'Fan'?
-                <View style={{width:40, height: 120, backgroundColor:'rgba(83,83,83,0.2)', borderRadius:20, marginTop:20, marginLeft:10,
+                  !this.state.connected?
+                    <View style={{width:40, height: 80, backgroundColor:'rgba(83,83,83,0.2)', borderRadius:20, marginTop:20, marginLeft:10,
+                      alignItems:'center', justifyContent:'center'}} >
+                      <TouchableOpacity onPress={this.goChat}><Image style={{width:20, height:20, resizeMode:'contain',}} source={require('../assets/images/like.png')}/></TouchableOpacity> 
+                      <TouchableOpacity onPress={() => this.props.navigation.goBack()}><Image style={{width:20, height:20, resizeMode:'contain', marginTop:20}} source={require('../assets/images/unlike.png')}/></TouchableOpacity> 
+                    </View>
+                    :<View style={{width:40, height: 40, backgroundColor:'rgba(83,83,83,0.2)', borderRadius:20, marginTop:20, marginLeft:10,
+                      alignItems:'center', justifyContent:'center'}} >
+                      <TouchableOpacity onPress={this.goChat}><Image style={{width:20, height:20, resizeMode:'contain'}} source={require('../assets/images/chat.png')}/></TouchableOpacity>
+                    </View>
+                :<View style={{width:40, height: 40, backgroundColor:'rgba(83,83,83,0.2)', borderRadius:20, marginTop:20, marginLeft:10,
                   alignItems:'center', justifyContent:'center'}} >
-                  <TouchableOpacity><Image style={{width:20, height:20, resizeMode:'contain'}} source={require('../assets/images/chat.png')}/></TouchableOpacity>
-                  <TouchableOpacity><Image style={{width:20, height:20, resizeMode:'contain', marginTop:20}} source={require('../assets/images/like.png')}/></TouchableOpacity> 
-                  <TouchableOpacity><Image style={{width:20, height:20, resizeMode:'contain', marginTop:20}} source={require('../assets/images/unlike.png')}/></TouchableOpacity> 
+                  <TouchableOpacity onPress={this.goChat}><Image style={{width:20, height:20, resizeMode:'contain'}} source={require('../assets/images/chat.png')}/></TouchableOpacity>
                 </View>
-                :<View/>
               }
               
               
@@ -365,7 +484,7 @@ export default class OtherProfile extends Component {
             <View style={{
               borderRadius:20, marginLeft:20, marginRight:20, padding:15, height:105, marginTop:-30, 
               backgroundColor: 'white', flexDirection:'row', shadowColor:'#000', shadowOffset:{width:0, height:2}, shadowOpacity:0.8, shadowRadius:2}} >
-               <CircleImage size={40} facebookID={this.state.user.id} imageURI={this.state.image} /> 
+               <CircleImage size={40} facebookID={this.state.user.id} imageURI={this.state.user.imgURL} /> 
               <View style={{flex: 1}}>
                 <View style={{flex:1, flexDirection:'row', marginLeft: 15,}} >
                   <View>
@@ -383,9 +502,14 @@ export default class OtherProfile extends Component {
                 </View>
                 <View style={{flexDirection:'row',marginLeft: 15,}} >
                   <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.gender} </Text>
-                  <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.age} </Text>
+                  {
+                    this.state.user.ageShow?
+                    <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.age} </Text>
+                    :<View/>
+                  }
+                  
                   <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.location?this.state.user.location:''} </Text>
-                  <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.distance} mls</Text>
+                  <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.distance} {this.state.currentUser.unit}</Text>
                   {this.state.user.type.name != 'Fan' && this.state.user.type.name != 'Business' ? <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.status?this.state.user.status:'Signed'} </Text>:<View/>}
                 </View>
               </View>
@@ -541,7 +665,8 @@ export default class OtherProfile extends Component {
             </View>            
             </ScrollView>
           </View>
-        </View>:<View/>
+        </View>
+        </MenuContext>:<View/>
         }
 
       </Drawer>

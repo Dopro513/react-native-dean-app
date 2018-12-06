@@ -85,7 +85,8 @@ export default class LoginScreen extends Component {
   createUser = (uid, userData) => {
     const defaults = {
       uid,
-      distance: 5,
+      distance: 500,
+      unit:'Mi',
       ageRange: [18, 24],
       posts:0,
       followers:0,
@@ -93,8 +94,10 @@ export default class LoginScreen extends Component {
       following:0,
       feedback:0,
       bio:'',
+      ageShow:true,
       status:'Independent',
       location: 'London',
+      imgURL:'',
       username: userData.first_name+' '+userData.last_name
     }
     firebase.database().ref('users').once('value', (snap) =>{

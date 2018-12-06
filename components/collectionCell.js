@@ -22,10 +22,10 @@ export default class Cell extends Component {
             <View style={{flex:1,alignItems:'center'}}>
               <View style={{flexDirection:'row', flex:0.5,}}>
                 <View style={{flex:1, justifyContent:'flex-end', flexDirection:'row'}}>
-                  <Image source={this.props.item.thumb} style={{width:20, height:20, marginTop:10, resizeMode:'contain'}}/>
-                  <TouchableOpacity style={{alignItems:'center', width:20, height:20, marginTop:10, justifyContent:'center'}}>
+                  <Image source={this.props.item.thumb} style={{width:20, height:20, marginTop:10, marginRight:10, resizeMode:'contain'}}/>
+                  {/* <TouchableOpacity style={{alignItems:'center', width:20, height:20, marginTop:10, justifyContent:'center'}}>
                     <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:15, height:15}}/>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               </View>
             </View>

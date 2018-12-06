@@ -23,12 +23,19 @@ import Cell from '../components/collectionCell'
 import PopupDialog from 'react-native-popup-dialog'
 import CircleImage from '../components/circleImage'
 import FacebookImage from '../components/facebookImage'
-import Menu from './menu'
+import DrawerMenu from './menu'
 import BackButton from '../components/backButton'
 import RatingView from '../components/ratingView'
 import GenreView from '../components/genreView'
 import SkilView from '../components/skillView'
 import * as api from '../api/uploadAsync'
+import Menu, {
+  MenuContext,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+  renderers
+} from 'react-native-popup-menu'
 
 import { ImagePicker } from 'expo'
 
@@ -289,18 +296,41 @@ export default class ProfileScreen extends Component {
   }
 
   collectionCell = (item) => {
-    console.log(item)
+    console.log(item.item)
     return(
       <View>
-        <Image source={item.img} style={{height:(width-10)/3, width:(width-10)/3, resizeMode:'contain'}}>
+        <Image source={item.item.img} style={{height:(width-10)/3, width:(width-10)/3, resizeMode:'contain'}}>
           <View style={{flex:1, flexDirection:'row', alignItems:'center'}}>
             <View style={{flex:1,alignItems:'center'}}>
               <View style={{flexDirection:'row', flex:0.5,}}>
                 <View style={{flex:1, justifyContent:'flex-end', flexDirection:'row'}}>
-                  <Image source={item.thumb} style={{width:20, height:20, marginTop:10, resizeMode:'contain'}}/>
-                  <TouchableOpacity style={{alignItems:'center', width:20, height:20, marginTop:10, justifyContent:'center'}}>
-                    <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:15, height:15}}/>
-                  </TouchableOpacity>
+                  
+                  <Menu>
+                    <MenuTrigger>
+                    <Image source={item.item.thumb} style={{width:20, height:20, marginTop:10,marginRight:10, resizeMode:'contain'}}/>
+                    </MenuTrigger>
+                    <MenuOptions style={{}} >
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Make Profile Photo</Text>
+                      </MenuOption>
+                      <MenuOption disabled={true} style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(213,213,213)'}}>Promot</Text>
+                      </MenuOption>
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Edit</Text>
+                      </MenuOption>
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)'}}>Share</Text>
+                      </MenuOption>
+                      <MenuOption style={{height:40, marginLeft:30, justifyContent:'center'}}>
+                        <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'red'}}>Delete</Text>
+                      </MenuOption>
+                      
+                    </MenuOptions>
+                  </Menu>
+                  {/* <TouchableOpacity onPress={this.selectCell(item)} style={{alignItems:'center', width:20, height:20, marginTop:10, justifyContent:'center'}}>
+                    
+                  </TouchableOpacity> */}
                 </View>
               </View>
             </View>
@@ -318,7 +348,7 @@ export default class ProfileScreen extends Component {
           ref={(ref) => this._drawer = ref}
           type="static"
           content={
-            <Menu closeDrawer={this.closeDrawer} />
+            <DrawerMenu closeDrawer={this.closeDrawer} />
           }
           acceptDoubleTap
           styles={{main: {shadowColor: '#000000', shadowOpacity: 0.3, shadowRadius: 15}}}
@@ -343,13 +373,14 @@ export default class ProfileScreen extends Component {
           >
           {
             this.state.fontLoaded?
+            
             <View style={{backgroundColor: 'rgb(83, 83, 83)', flex:1}}>
               <View style={{flexDirection: 'row', height:70, backgroundColor: 'rgb(83, 83, 83)'}}>
                   <TouchableOpacity onPress={() => this.state.drawerOpen ? this._drawer.close() : this._drawer.open()} style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
                       <Image source={require('../assets/images/menu.png')} style={{resizeMode:'contain', width:20, height:20}}/>
                   </TouchableOpacity> 
                   <View style={{flex:1, height:50, marginTop:20, alignItems:'center', justifyContent:'center'}}>
-                      <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> My Profile </Text>
+                      <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> {this.state.user.username} </Text>
                   </View>
                   <TouchableOpacity style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
                     <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:20, height:20}}/>
@@ -357,7 +388,7 @@ export default class ProfileScreen extends Component {
               </View>
               <View style={{backgroundColor:'white', height:height-120}}>
                 <ScrollView style={{height:height-120}}>
-                <FacebookImage width={width} height={width} imageURI={this.state.image} facebookID={this.state.user.id} size={width}>
+                <FacebookImage width={width} height={width} imageURI={this.state.user.imgURL} facebookID={this.state.user.id} size={width}>
                   <View style={{width:40, height: 40, backgroundColor:'rgba(83,83,83,0.2)', borderRadius:20, marginTop:20, marginLeft:10,
                     alignItems:'center', justifyContent:'center'}} >
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('EditProfile', {user:this.state.user, refresh: this.fetchUser})}><Image style={{width:20, height:20, resizeMode:'cover'}} source={require('../assets/images/pen.png')}/></TouchableOpacity>
@@ -369,7 +400,7 @@ export default class ProfileScreen extends Component {
                 <View style={{
                   borderRadius:20, marginLeft:20, marginRight:20, padding:10, height:105, marginTop:-30, 
                   backgroundColor: 'white', flexDirection:'row', shadowColor:'#000', shadowOffset:{width:0, height:2}, shadowOpacity:0.8, shadowRadius:2}} >
-                  <CircleImage size={40} facebookID={this.state.user.id} imageURI={this.state.image} /> 
+                  <CircleImage size={40} facebookID={this.state.user.id} imageURI={this.state.user.imgURL} /> 
                   <View style={{flex: 1}}>
                     <View style={{flex:1, flexDirection:'row', marginLeft: 15,}} >
                       <View>
@@ -387,7 +418,11 @@ export default class ProfileScreen extends Component {
                     </View>
                     <View style={{flexDirection:'row',marginLeft: 15, marginTop:5}} >
                       <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.gender} </Text>
-                      <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.age} </Text>
+                      {
+                        this.state.user.ageShow?
+                        <Text style={{fontSize: 10, margin:3, color:'rgb(39,206,169)', fontFamily:'WorkSans-Regular'}}> {this.state.age} </Text>
+                        :<View/>
+                      }
                       <Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.location?this.state.user.location:''} </Text>
                 
                       {this.state.user.type.name != 'Fan' && this.state.user.type.name != 'Business' ?<Text style={{fontSize: 10, margin:3, fontFamily:'WorkSans-Regular', color:'rgb(83,83,83)'}}> {this.state.user.status?this.state.user.status:'Signed'} </Text>:<View/>}
@@ -475,7 +510,7 @@ export default class ProfileScreen extends Component {
                 {
                   !this.state.showGenres ? <View/> :
                   <View style={{marginLeft:30, marginRight:30, marginTop:10}}>
-                  <GenreView genres={this.state.user.genres?this.state.user.genres:[]}/>
+                    <GenreView genres={this.state.user.genres?this.state.user.genres:[]}/>
                   </View>
                 }
                 {
@@ -519,7 +554,9 @@ export default class ProfileScreen extends Component {
                   <View style={{width:50}}/>
                   <TouchableOpacity onPress={() => this.setState({collection:2})}><Image source={this.state.collection==2?require('../assets/images/sel_users.png'):require('../assets/images/users.png')} style={{width:25, height:25, resizeMode:'contain'}}/></TouchableOpacity>
                 </View>
+                
                 <View style={{height:width}}>
+                <MenuContext>
                   <CollectionView component={this.collectionCell}
                     dataSource={dataSource}
                     selectionMode={false}
@@ -548,10 +585,13 @@ export default class ProfileScreen extends Component {
                             }
                             }
                     />
-                </View>            
+                    </MenuContext>
+                </View>        
+                
                 </ScrollView>
               </View>
             </View>
+            
             :<View/>
           }
 

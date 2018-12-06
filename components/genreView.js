@@ -7,44 +7,38 @@ import {
 } from 'react-native'
 
 export default class GenreView extends Component {
-  render() {
-      
-    if(this.props.genres.length >= 3) {
+
+    renderGen = () => {
+        console.log(this.props.genres)
+        this.props.genres.map((genre) => {
+            var width = genre.name.length*12
+            console.log(width)
+            return(
+                <View style={{alignItems:'center', justifyContent:'center', borderRadius:20, height:20, width:width, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
+                    <Text style={{color:'white', margin:5, fontSize:10,}}>{genre.name}</Text>
+                </View>
+            )
+        })
+    }
+
+    render() {
         return (
-        <View style={{flexDirection:'row'}}>
-            <View style={{alignItems:'center', justifyContent:'center', borderRadius:20, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
-                <Text style={{color:'white', margin:5, fontSize:10,}}>{this.props.genres[0].name}</Text>
-            </View>
-            <View style={{alignItems:'center', marginLeft:10, justifyContent:'center', borderRadius:20, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
-                <Text style={{color:'white', margin:5, fontSize:10,}}>{this.props.genres[1].name}</Text>
-            </View>
-            <View style={{alignItems:'center', marginLeft:10, justifyContent:'center', borderRadius:20, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
-                <Text style={{color:'white', margin:5, fontSize:10,}}>{this.props.genres[2].name}</Text>
-            </View>
-        </View> 
+            <Text style={{lineHeight:30}}>
+                {
+                    this.props.genres.map((genre, index) => {
+                        var width = genre.name.length*6 + 20
+                        return (
+                            <View key={index} style={{width:width, height:20, flexDirection:'row'}}>
+                                <View key={index} style={{alignItems:'center', justifyContent:'center', borderRadius:20, height:20, width:width-10, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
+                                    <Text style={{color:'white', fontSize:10,}}>{genre.name}</Text>
+                                </View>
+                                <View style={{width:10, height:20}}/>
+                            </View>
+                        )
+                    })
+                }
+            </Text> 
         )
     }
-    else if(this.props.genres.length == 2) {
-        return (
-        <View style={{flexDirection:'row'}}>
-            <View style={{alignItems:'center', justifyContent:'center', borderRadius:20, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
-                <Text style={{color:'white', margin:5, fontSize:10,}}>{this.props.genres[0].name}</Text>
-            </View>
-            <View style={{alignItems:'center', marginLeft:10, justifyContent:'center', borderRadius:20, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
-                <Text style={{color:'white', margin:5, fontSize:10,}}>{this.props.genres[1].name}</Text>
-            </View>
-        </View>
-        )
-    }
-    else if(this.props.genres.length == 1) {
-        return (
-        <View style={{flexDirection:'row'}}>
-            <View style={{alignItems:'center', justifyContent:'center', borderRadius:20, backgroundColor:'rgb(209, 16, 56)', overflow:'hidden'}}>
-                <Text style={{color:'white', margin:5, fontSize:10,}}>{this.props.genres[0].name}</Text>
-            </View>
-        </View>
-        )
-    }
-  }
 }
 

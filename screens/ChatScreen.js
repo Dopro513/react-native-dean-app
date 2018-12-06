@@ -16,7 +16,7 @@ import {
 
 import * as firebase from 'firebase'
 import PushNotificationsAsync from '../api/pushNotificationAsync';
-
+import FacebookImage from '../components/facebookImage'
 import {GiftedChat, Actions, Bubble} from 'react-native-gifted-chat'
 import BackButton from '../components/backButton'
 import RoundedButton from '../components/roundedButton'
@@ -246,10 +246,12 @@ export default class ChatScreen extends Component {
   }
 
   render() {
-    const avatar = `https://graph.facebook.com/${this.state.user.id}/picture?height=80`
+    const avatar = this.state.user.imgURL?this.state.user.imgURL:`https://graph.facebook.com/${this.state.user.id}/picture?height=80`
+    const topImage = this.state.profile.imgURL?this.state.profile.imgURL:`https://graph.facebook.com/${this.state.profile.id}/picture?height=80`
     return (
       <View style={{flex:1, backgroundColor:'white'}}>
         <View style={{flexDirection: 'row', height:70, backgroundColor: 'rgb(83, 83, 83)'}}>
+        <Image style={{width:width, height:70, resizeMode:'cover'}} source={{url:topImage}}>
             <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
                 <Image source={require('../assets/images/back.png')} style={{resizeMode:'contain', width:20, height:20}}/>
             </TouchableOpacity> 
@@ -259,14 +261,27 @@ export default class ChatScreen extends Component {
             <TouchableOpacity style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
               <Image source={require('../assets/images/menu1.png')} style={{resizeMode:'contain', width:20, height:20}}/>
             </TouchableOpacity>
+          </Image>
         </View>
         <GiftedChat
         text={this.state.messageText}
         onInputTextChanged={(text) => this.setCustomText(text)}
         messages={this.state.messages}
-        user={{_id: this.state.user.uid, avatar, name:this.state.user.first_name+" "+this.state.user.last_name}}
+        user={{_id: this.state.user.uid, name:this.state.user.username}}
         onSend={this.onSend}
-       
+        renderAvatar={(message) => {
+          if(message.currentMessage.user._id == this.state.profile.uid) {
+            return (
+              <TouchableOpacity onPress={this.goToProfile}>
+                <CircleImage imageURI={this.state.profile.imgURL} size={36} facebookID={this.state.profile.id} />
+              </TouchableOpacity>
+              )
+          }else {
+            return (<CircleImage imageURI={this.state.user.imgURL} size={36} facebookID={this.state.user.id} />)
+          }
+          
+        }}
+
         showUserAvatar={true}/>
         {this.state.emoji ? <EmojiPicker onPick={emoji => this.setCustomEmoji(emoji)}/> : <View/>}
 
@@ -283,9 +298,9 @@ export default class ChatScreen extends Component {
             <Image source={require('../assets/images/lines.png')} style={{resizeMode: 'contain', width:width*0.7, height:10, margin:10,}} />
             <Text style={{textAlign: 'center', fontSize:14, color: 'rgb(17,17,17)', marginBottom: 10, fontFamily:'WorkSans-Light'}}> Send up to 1 invitation to </Text>
             <View style={{flexDirection:'row', alignItems:'center'}}> 
-              <CircleImage imageURI={''} size={73} facebookID={this.state.profile.id} />
+              <CircleImage imageURI={this.state.profile.imgURL} size={73} facebookID={this.state.profile.id} />
             </View>
-            <Text style={{textAlign: 'center', fontSize:14, color: 'rgb(209,16,56)', lineHeight:24, fontFamily:'WorkSans-SemiBold', marginBottom: 10}}> {this.state.profile.first_name + " " + this.state.profile.last_name} </Text>
+            <Text style={{textAlign: 'center', fontSize:14, color: 'rgb(209,16,56)', lineHeight:24, fontFamily:'WorkSans-SemiBold', marginBottom: 10}}> {this.state.profile.username} </Text>
             <View style={{height:40, paddingLeft: 10, paddingRight: 10, flexDirection:'row', backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'}} >
               <BlackRoundedButton style={{flex:0.5}} text={'Continue'} onPress={() => this.continue(true)}/>
               <View style={{width:25}}/>
@@ -306,7 +321,7 @@ export default class ChatScreen extends Component {
             <Image source={require('../assets/images/lines.png')} style={{resizeMode: 'contain', width:width*0.7, height:10, margin:10,}} />
             <Text style={{textAlign: 'center', lineHeight:20, fontSize:14, color: 'rgb(17,17,17)', fontFamily:'WorkSans-Light', marginBottom: 10}}> Do you want to connect{'\n'}and collaborate with </Text>
             <View style={{flexDirection:'row', alignItems:'center'}}> 
-              <CircleImage imageURI={''} size={73} facebookID={this.state.profile.id} />
+              <CircleImage imageURI={this.state.profile.imgURL} size={73} facebookID={this.state.profile.id} />
             </View>
             <Text style={{textAlign: 'center', fontSize:14, color: 'rgb(209,16,56)', marginBottom: 10, fontFamily:'WorkSans-SemiBold', lineHeight:24}}> {this.state.profile.first_name + " " + this.state.profile.last_name} </Text>
             <View style={{height:40, paddingLeft: 10, paddingBottom:10, paddingRight: 10, flexDirection:'row', backgroundColor: 'white', justifyContent: 'center', alignItems: 'center'}} >
@@ -321,7 +336,9 @@ export default class ChatScreen extends Component {
     )
   }
 
-  
+  goToProfile = () =>{
+    this.props.navigation.navigate('OtherProfile', {userId:this.state.profile.uid, currentUser:this.state.user, fromChat:true})
+  }
 
   continue = (state) => {
     this.popupDialog.dismiss()

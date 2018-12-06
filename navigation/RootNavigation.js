@@ -13,6 +13,7 @@ import SelectTypeScreen from '../screens/SelectTypeScreen';
 import SelectSkillScreen from '../screens/SelectSkillScreen';
 import GenresScreen from '../screens/GenresScreen';
 import EditProfile from '../screens/EditProfile';
+import SettingScreen from '../screens/profile';
 
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import * as firebase from 'firebase';
@@ -60,6 +61,9 @@ const RootStackNavigator = StackNavigator(
     },
     OtherProfile: {
       screen: OtherProfile,
+    },
+    SettingScreen: {
+      screen: SettingScreen,
     }
   },
   {

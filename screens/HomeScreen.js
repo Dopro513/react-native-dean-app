@@ -22,6 +22,7 @@ export default class HomeScreen extends Component {
     profileIndex: 0,
     profiles: [],
     user: this.props.user,
+    title:'Filter',
   }
 
   static navigationOptions = {
@@ -98,11 +99,11 @@ export default class HomeScreen extends Component {
       // console.log('profile : ', profiles)
       const filtered = filter(profiles, this.state.user, swipedProfiles) || []
       console.log('filtered',filtered)
-      if(filtered.length != 0) {
+      // if(filtered.length != 0) {
         if(this._mounted){
           this.setState({profiles: filtered})
         }
-      }
+      // }
     })
     
   }
@@ -112,9 +113,9 @@ export default class HomeScreen extends Component {
     const {status} = await Permissions.askAsync(Permissions.LOCATION)
     if (status === 'granted') {
       const location = await Location.getCurrentPositionAsync({enableHighAccuracy: false})
-      // const {latitude, longitude} = location.coords
-      const latitude = 37.39239 //demo lat
-      const longitude = -122.09072 //demo lon
+      const {latitude, longitude} = location.coords
+      // const latitude = 37.39239 //demo lat
+      // const longitude = -122.09072 //demo lon
 
       const geoFireRef = new GeoFire(firebase.database().ref('geoData'))
       geoFireRef.set(uid, [latitude, longitude])
@@ -136,6 +137,9 @@ export default class HomeScreen extends Component {
   nextCard = (swipedRight, profileUid) => {
     const userUid = this.state.user.uid
     var profile = this.state.profiles[this.state.profileIndex]
+    this.setState({
+      title:'Feed',
+    })
     this.setState({profileIndex: this.state.profileIndex + 1})
     if (swipedRight) {
       // this.relate(userUid, profileUid, true)
@@ -194,26 +198,30 @@ export default class HomeScreen extends Component {
       panOpenMask={0.2}
       negotiatePan
       >
-      <View style={{flex:1, backgroundColor: 'rgb(83, 83, 83)'}}>
+      {
+
+        <View style={{flex:1, backgroundColor: 'rgb(83, 83, 83)'}}>
             <View style={{flexDirection: 'row', height:70, backgroundColor: 'rgb(83, 83, 83)'}}>
                 {/* <TouchableOpacity onPress={() => this.state.drawerOpen ? this._drawer.close() : this._drawer.open()} style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
                     <Image source={require('../assets/images/menu.png')} style={{resizeMode:'contain', width:20, height:20}}/>
                 </TouchableOpacity>  */}
+                <View style={{width:50, height:50}}/>
                 <View style={{flex:1, height:50, marginTop:20, alignItems:'center', justifyContent:'center'}}>
                     <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> Feed </Text>
                 </View>
-                {/* <TouchableOpacity style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
+                <TouchableOpacity onPress={() => this.props.rootNav.navigate('SettingScreen', {user:this.state.user, getProfiles:this.getProfiles})} style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
                   <Image source={require('../assets/images/search.png')} style={{resizeMode:'contain', width:20, height:20}}/>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
             </View>
       <SimpleScroller
         screens={[
-           <Profile user={this.state.user} />, 
            this.cardStack(), 
           //<Matches navigation={this.props.rootNav} user={this.state.user} />,
           ]}
       />
       </View>
+      }
+      
       </Drawer>
     )
   }

@@ -49,11 +49,11 @@ export default class Card extends Component {
   }
 
   render() {
-    const {birthday, first_name, last_name, work, id, type} = this.props.profile
+    const {birthday, first_name, last_name, work, id, type, username, imgURL} = this.props.profile
     const bio = (work && work[0] && work[0].position) ? work[0].position.name : null
     const profileBday = moment(birthday, 'MM/DD/YYYY')
     const profileAge = moment().diff(profileBday, 'years')
-    const fbImage = `https://graph.facebook.com/${id}/picture?height=500`
+    const fbImage = imgURL == ''?`https://graph.facebook.com/${id}/picture?height=500`:imgURL
 
     const rotateCard = this.pan.x.interpolate({
       inputRange: [-200, 0, 200],
@@ -76,7 +76,6 @@ export default class Card extends Component {
           style={{flex:1}}
           source={{uri: fbImage}}
         >
-        <TouchableOpacity style={{flex:1}} onPress={() => this.props.navigation.navigate('OtherProfile', {userId:this.props.profile.uid, currentUser:this.props.user})}>
         <View style={{flex:1, justifyContent:'flex-end'}}>
           <View style={{flexDirection:'row', height:40, justifyContent:'flex-end'}}>
             <TouchableOpacity style={{backgroundColor:'rgb(83,83,83)', width:30, height:40, justifyContent:'center', alignItems:'center'}}>
@@ -85,11 +84,13 @@ export default class Card extends Component {
           </View>
           <View style={{flex:1}}/>
           <View style={{borderRadius:20, marginLeft:5, marginRight:5, padding:15, height:80, backgroundColor: 'white', flexDirection:'row'}} >
-            <CircleImage size={36} facebookID={id} imageURI={''} /> 
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('OtherProfile', {userId:this.props.profile.uid, currentUser:this.props.user})}>
+            <CircleImage size={36} facebookID={id} imageURI={this.props.profile.imgURL} /> 
+            </TouchableOpacity>
             <View style={{flex: 1}}>
               <View style={{flex:1, flexDirection:'row', marginLeft: 15,}} >
                 <View>
-                  <Text style={{fontSize: 14, color:'rgb(17,17,17)',fontFamily:'WorkSans-Light'}}> {first_name} {last_name} </Text>
+                  <Text style={{fontSize: 14, color:'rgb(17,17,17)',fontFamily:'WorkSans-Light'}}> {username} </Text>
                   <Text style={{fontSize:20, color:'rgb(17,17,17)',fontFamily:'AbrilFatface-Regular'}}> {type?type.name:''} </Text>
                   {type.name != 'Fan' ? <Text style={{fontSize:10, color:'rgb(39,206,169)',fontFamily:'WorkSans-Bold'}}> Visual Arts & Design </Text> : <View/>}
                 </View>
@@ -109,7 +110,6 @@ export default class Card extends Component {
             </View>
           </TouchableOpacity>
         </View>
-        </TouchableOpacity>
         </Image>
         
       </Animated.View>

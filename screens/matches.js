@@ -180,20 +180,21 @@ export default class MatchesScreen extends Component {
   }
 
   renderRow1 = (rowData) => {
-    const {id, first_name, last_name, work, uid} = rowData.profile
+    const {id, first_name, last_name, work, uid, username, imgURL} = rowData.profile
+    console.log(rowData.profile)
     // const bio = (work && work[0] && work[0].position) ? work[0].position.name : null
     const {text} = rowData
-    const {name} = rowData.user
+    // const {avatar} = rowData.user
     return (
       
         <View style={{flex:1,marginTop:5,paddingLeft:10, flexDirection:'row', backgroundColor:'white', height:70, alignItems:'center', borderWidth:1, borderColor:'rgb(240,240,240)'}} >
           <TouchableOpacity onPress={() => this.props.navigation.navigate('OtherProfile', {userId:uid, currentUser:this.props.user})}>
-          <CircleImage size={50} facebookID={id} imageURI={''} />
+          <CircleImage size={50} facebookID={id} imageURI={imgURL} />
           </TouchableOpacity>
           <TouchableOpacity style={{flex:1}}
           onPress={() => this.props.navigation.navigate('Chat', {user:this.props.user, profile:rowData.profile,})} >
             <View style={{justifyContent:'center', marginLeft:10}} >
-              <Text style={{color: 'rgb(209,16,56)', fontFamily:'WorkSans-SemiBold', fontSize:14,}} >{first_name} {last_name}</Text>
+              <Text style={{color: 'rgb(209,16,56)', fontFamily:'WorkSans-SemiBold', fontSize:14,}} >{username}</Text>
               <Text multiline={false} style={{fontSize:10, lineHeight:18, color:'rgb(83,83,83)', marginTop:5}} >{text}</Text>
             </View>
           </TouchableOpacity>
@@ -203,19 +204,20 @@ export default class MatchesScreen extends Component {
   }
 
   renderRow2 = (rowData) => {
-    const {id, first_name, last_name, bio, uid} = rowData
+    const {id, first_name, last_name, bio, uid, username, imgURL} = rowData
+    console.log(rowData )
     // const bio = (work && work[0] && work[0].position) ? work[0].position.name : null
     return (
       
         <View style={{flex:1, paddingLeft:10, marginTop:5, flexDirection:'row', backgroundColor:'white', height:70, alignItems:'center', borderWidth:1, borderColor:'rgb(240,240,240)'}} >
           <TouchableOpacity onPress={() => this.props.navigation.navigate('OtherProfile', {userId:uid, currentUser:this.props.user})}>
-          <CircleImage size={50} facebookID={id} imageURI={''} />
+          <CircleImage size={50} facebookID={id} imageURI={imgURL} />
           </TouchableOpacity>
           <TouchableOpacity style={{flex:1}}
           onPress={() => this.props.navigation.navigate('Chat', {user:this.props.user, profile:rowData,})} >
             <View style={{justifyContent:'center', marginLeft:10}} >
-              <Text style={{color: 'rgb(209,16,56)', fontFamily:'WorkSans-SemiBold', fontSize:14,}} >{first_name} {last_name}</Text>
-              <Text multiline={false} style={{fontSize:10, lineHeight:18, color:'rgb(83,83,83)', marginTop:5}}>{bio}</Text>
+              <Text style={{color: 'rgb(209,16,56)', fontFamily:'WorkSans-SemiBold', fontSize:14,}} >{username}</Text>
+              <Text numberOfLines={2} multiline={false} style={{fontSize:10, lineHeight:18, color:'rgb(83,83,83)', marginTop:5}}>{bio}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -238,17 +240,17 @@ export default class MatchesScreen extends Component {
   }
 
   renderColumn = (rowData) => {
-    const {id, first_name, last_name, uid} = rowData
+    const {id, first_name, last_name, uid, username, imgURL} = rowData
     // const bio = (work && work[0] && work[0].position) ? work[0].position.name : null
     return (
       
           <View style={{justifyContent:'center', alignItems: 'center', width:90, height:100, padding:5}} >
             <TouchableOpacity onPress={() => this.props.navigation.navigate('OtherProfile', {userId:uid, currentUser:this.props.user})}>
-            <CircleImage size={50} facebookID={id} imageURI={''} />
+            <CircleImage size={50} facebookID={id} imageURI={imgURL} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => this.accept(rowData)} >
-              <Text style={{fontSize:10, paddingTop:5, color:'rgb(83,83,83)', fontFamily:'WorkSans-Regular'}} >{first_name} {last_name}</Text>
+              <Text style={{fontSize:10, paddingTop:5, color:'rgb(83,83,83)', fontFamily:'WorkSans-Regular'}} >{username}</Text>
             </TouchableOpacity>
           </View>
       
@@ -363,7 +365,10 @@ export default class MatchesScreen extends Component {
                     style={{flex:1,fontSize:14, fontFamily:'WorkSans-Light'}} 
                     onChangeText={this.changeSearch} />
             </View>
-            <View style={{flexDirection: 'row', backgroundColor: 'white', paddingLeft: 20, paddingBottom:5,}}><Text style={{color: 'rgb(17,17,17)', fontSize:14, fontFamily:'WorkSans-Light'}}>Connection requests</Text><Text style={{color: 'rgb(209,16,56)', fontSize:14, fontFamily:'WorkSans-SemiBold', marginLeft:5,}}>({this.state.matches.length})</Text></View>
+            <View style={{flexDirection: 'row', backgroundColor: 'white', paddingLeft: 20, paddingBottom:5,height:30}}>
+              <Text style={{color: 'rgb(17,17,17)', fontSize:14, fontFamily:'WorkSans-Light'}}>Connection requests</Text>
+              <Text style={{color: 'rgb(209,16,56)', fontSize:14, fontFamily:'WorkSans-SemiBold', marginLeft:5,}}>({this.state.matches.length})</Text>
+            </View>
             <View style = {{height:100}}>
               <ListView
                 style={{backgroundColor:'white',paddingLeft: 20, flex:1}}
@@ -376,7 +381,10 @@ export default class MatchesScreen extends Component {
               <TouchableOpacity onPress={() => this.onChats()} style={{flex:1, justifyContent: 'center', alignItems:'center'}}><Text style={this.state.isChat ? {color: 'rgb(209,16,56)', fontFamily:'WorkSans-SemiBold', fontSize:14}:{color: 'rgb(17,17,17)', fontFamily:'WorkSans-Light', fontSize:14}}>Chats</Text></TouchableOpacity>
               <TouchableOpacity onPress={() => this.onContacts()} style={{flex:1, justifyContent: 'center', alignItems:'center'}}><Text style={this.state.isChat ? {color: 'rgb(17,17,17)', fontFamily:'WorkSans-Light', fontSize:14}:{color: 'rgb(209,16,56)', fontFamily:'WorkSans-SemiBold', fontSize:14}}>Contacts</Text></TouchableOpacity>
             </View>
-            <View style={{flexDirection: 'row', backgroundColor: 'white', paddingLeft: 20, paddingTop:15, paddingBottom:15}}><Text style={{color: 'rgb(17,17,17)', fontSize:14, fontFamily:'WorkSans-Light'}}>{this.state.isChat ? 'Messages' : 'Contacts'}</Text><Text style={{color: '#D11038', fontFamily:'WorkSans-SemiBold', marginLeft: 5}}>({this.state.isChat ? this.state.messages.length : this.state.contacts.length})</Text></View>
+            <View style={{flexDirection: 'row', backgroundColor: 'white', paddingLeft: 20, paddingTop:15, paddingBottom:15, height:50}}>
+              <Text style={{color: 'rgb(17,17,17)', fontSize:14, fontFamily:'WorkSans-Light', lineHeight:20}}>{this.state.isChat ? 'Messages' : 'Contacts'}</Text>
+              <Text style={{color: '#D11038', fontFamily:'WorkSans-SemiBold', marginLeft: 5, lineHeight:20}}>({this.state.isChat ? this.state.messages.length : this.state.contacts.length})</Text>
+            </View>
             <View style={{backgroundColor: 'white', paddingBottom:50,}}>
               <Swiper ref={(ref) => this.swipRef=ref} style={{backgroundColor:'white',}} height={height-300} showsButtons={false} scrollEnabled={false} dotColor='transparent' activeDotColor='transparent'>
                 <View style={{flex: 1,}}>

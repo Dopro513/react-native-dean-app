@@ -31,6 +31,10 @@ export default class MainTabNavigator extends Component {
             chatNoti:0,
         }
     }
+
+    componentWillMount() {
+        this._mounted = false
+    }
     
     async fontLoad() {
         await Font.loadAsync({
@@ -42,9 +46,12 @@ export default class MainTabNavigator extends Component {
         this.setState({ fontLoaded: true });
     }
     componentWillMount() {
+        this._mounted = true
         this.fetchUser()
         this.noti = 0
         firebase.database().ref('notifications').child(this.state.user.uid).on('value', (snap) => {
+
+            if(!this._mounted) return
             var arr = _.values(snap.val())||[]
             var notify = 0
             arr.map((noti) => {
@@ -58,6 +65,7 @@ export default class MainTabNavigator extends Component {
         })
 
         firebase.database().ref('lastmessages').child(this.state.user.uid).on('value', (snap) => {
+            if(!this._mounted) return
             var arr = _.values(snap.val())||[]
             var notify = 0
             arr.map((noti) => {
@@ -76,6 +84,7 @@ export default class MainTabNavigator extends Component {
         console.log('fetch data')
         firebase.database().ref('users').child(this.state.user.uid).on('value', (snap) => {
         console.log(snap.val())
+        if(!this._mounted) return
         this.setState({
             user:snap.val()||{},
         })

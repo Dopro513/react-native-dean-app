@@ -13,6 +13,7 @@ import {
   ScrollView,
   Modal,
   StyleSheet,
+  Alert,
   Picker,
 } from 'react-native'
 import moment from 'moment'
@@ -81,7 +82,7 @@ export default class EditProfile extends Component {
       collection:0,
       age:'',
       date:this.props.navigation.state.params.user.birthday,
-      isChecked:true,
+      isChecked:this.props.navigation.state.params.user.ageShow,
       isCheckedUsername:true,
       modalVisible:false,
       dataSource: ds.cloneWithRows(require('../components/profileType.json')),
@@ -122,7 +123,7 @@ export default class EditProfile extends Component {
   componentWillMount() {
     var userBirthday = moment(this.state.user.birthday, 'MM/DD/YYYY')
     var userAge = moment().diff(userBirthday, 'years')
-    console.log(userAge)
+    // console.log(userAge)
     this.setState({
       age: userAge,
     })
@@ -170,7 +171,7 @@ export default class EditProfile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
+    // console.log(nextProps)
   }
 
   showBio = () => {
@@ -186,19 +187,19 @@ export default class EditProfile extends Component {
   }
 
   tapHandler(param){
-    console.log('item tapped'+ param);
+    // console.log('item tapped'+ param);
   }
 
   eftHandler(param){
-    console.log('left button clicked');
+    // console.log('left button clicked');
   }
   rightHandler(param){
-    console.log('right button clicked: ' + param);
+    // console.log('right button clicked: ' + param);
   }
 
   _pickImage = async () => {
 
-    console.log('sample test')
+    // console.log('sample test')
 
     // if (useCamera) {
     //   result = await ImagePicker.launchCameraAsync({
@@ -212,7 +213,7 @@ export default class EditProfile extends Component {
     // }
 
 
-    console.log(result)
+    // console.log(result)
 
     if (!result.cancelled) {
       this.setState({image: result.uri})
@@ -221,7 +222,7 @@ export default class EditProfile extends Component {
     let byteArray = this.convertToByteArray(result.base64);
 
     api.uploadAsByteArray(this.state.user.uid, byteArray, (progress) => {
-      console.log(progress)
+      // console.log(progress)
       this.setState({ progress })
     })
 
@@ -247,17 +248,17 @@ export default class EditProfile extends Component {
         title: "Testing ActionSheet"
       }, buttonIndex => {
         // this 'buttonIndex value is a string on android and number on ios :-(
-        console.log(buttonIndex)
+        // console.log(buttonIndex)
         if (buttonIndex + "" === '0') {
           this._pickImage(true)
         } else if (buttonIndex + "" === '1') {
           this._pickImage(false)
         } else {
-          console.log('nothing')
+          // console.log('nothing')
         }
       })
     } catch (ee) {
-      console.log(ee)
+      // console.log(ee)
     }
   }
 
@@ -300,13 +301,13 @@ export default class EditProfile extends Component {
           progressCallback && progressCallback(snapshot.bytesTransferred / snapshot.totalBytes)
     
           var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log('Upload is ' + progress + '% done');
+          // console.log('Upload is ' + progress + '% done');
     
         }, function (error) {
-          console.log("in _uploadAsByteArray ", error)
+          // console.log("in _uploadAsByteArray ", error)
         }, function () {
           var downloadURL = uploadTask.snapshot.downloadURL;
-          console.log("_uploadAsByteArray ", uploadTask.snapshot.downloadURL)
+          // console.log("_uploadAsByteArray ", uploadTask.snapshot.downloadURL)
     
           // save a reference to the image for listing purposes
           var ref = firebase.database().ref('assets');
@@ -322,7 +323,7 @@ export default class EditProfile extends Component {
     
     
       } catch (ee) {
-        console.log("when trying to load _uploadAsByteArray ", ee)
+        // console.log("when trying to load _uploadAsByteArray ", ee)
       }
     }
 
@@ -370,9 +371,22 @@ export default class EditProfile extends Component {
 
   addSkills = (skill) => {
     var skillList = this.state.skills
+
+    var isExist = false
+    for(var i=0;i<skillList.length;i++) {
+      var item = skillList[i]
+      if(skill.id == item.id) {
+        isExist = true
+      }
+    }
+
+    if(isExist) {
+      Alert.alert("You already selected") 
+      return
+    }
     skill.selected = true
     skillList.push(skill)
-    console.log(skillList)
+    // console.log(skillList)
     if(this.state.skillString == '') {
       var str = "#"+skill.name
       this.setState({
@@ -392,10 +406,23 @@ export default class EditProfile extends Component {
   }
 
   addGenres = (genre) => {
+    var isExist = false
     var genreList = this.state.genres
+    for(var i=0;i<genreList.length;i++) {
+      var item = genreList[i]
+      if(genre.id == item.id) {
+        isExist = true
+      }
+    }
+
+    if(isExist) {
+      Alert.alert("You already selected") 
+      return
+    }
+    
     genre.selected = true
     genreList.push(genre)
-    console.log(genreList)
+    
     var str = this.state.genresString+", #"+genre.name
     this.setState({
       genres:genreList,
@@ -411,21 +438,58 @@ export default class EditProfile extends Component {
       return
     }
 
-    const defaults = {
-      skills:this.state.skills,
-      genres:this.state.genres,
-      bio:this.state.bio,
-      status:this.state.selectedStatus,
-      birthday:this.state.date,
-      gender:this.state.selectedGender,
-      location:this.state.userLocation,
-      type:this.state.selectedRole,
-      first_name:this.state.firstname,
-      last_name:this.state.lastname,
-      username:this.state.username,
-    }
-    firebase.database().ref('users').child(this.state.user.uid).update({...defaults})
-    this.goBack()
+    firebase.database().ref('users').on('value', (snap)=>{
+      var arr = _.values(snap.val())
+      var isExist = false
+      for(var i=0; i<arr.length; i++){
+        var item = arr[i]
+        if(item.username == this.state.username && item.uid != this.state.user.uid) {
+          isExist = true
+        }
+      }
+
+      if(isExist) {
+        Alert.alert('Username is already existing!')
+      } else {
+        if(this.state.date == null) {
+          const defaults = {
+            skills:this.state.skills,
+            genres:this.state.genres,
+            bio:this.state.bio,
+            status:this.state.selectedStatus,
+            gender:this.state.selectedGender,
+            location:this.state.userLocation,
+            type:this.state.selectedRole,
+            first_name:this.state.firstname,
+            last_name:this.state.lastname,
+            username:this.state.username,
+            ageShow:this.state.isChecked,
+          }
+          firebase.database().ref('users').child(this.state.user.uid).update({...defaults})
+          this.goBack()
+        } else {
+          const defaults = {
+            skills:this.state.skills,
+            genres:this.state.genres,
+            bio:this.state.bio,
+            status:this.state.selectedStatus,
+            birthday:this.state.date,
+            gender:this.state.selectedGender,
+            location:this.state.userLocation,
+            type:this.state.selectedRole,
+            first_name:this.state.firstname,
+            last_name:this.state.lastname,
+            username:this.state.username,
+            ageShow:this.state.isChecked,
+          }
+          firebase.database().ref('users').child(this.state.user.uid).update({...defaults})
+          this.goBack()
+        }
+        
+      }
+    })
+
+    
   }
 
   static renderSkill(skill) {
@@ -466,7 +530,7 @@ export default class EditProfile extends Component {
   }
 
   onKeyPress = (key) => {
-    console.log(key)
+    // console.log(key)
   }
 
   render() {
@@ -491,7 +555,7 @@ export default class EditProfile extends Component {
                     <Image source={require('../assets/images/back.png')} style={{resizeMode:'contain', width:20, height:10}}/>
                 </TouchableOpacity> 
                 <View style={{flex:1, marginLeft:30, height:50, marginTop:20, alignItems:'center', justifyContent:'center'}}>
-                    <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> My Profile </Text>
+                    <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> {this.state.user.username} </Text>
                 </View>
                 <TouchableOpacity style={{marginTop:20, height:50, width:70, alignItems:'center', marginRight:10, justifyContent:'center'}} onPress={this.saveUser}>
                   <Text style={{backgroundColor:'rgb(39,206,169)', textAlign:'center', fontFamily:'WorkSans-Light', overflow:'hidden', paddingTop:5, paddingBottom:5, width:70, borderRadius:13, fontSize:13, color:'white'}}>Save</Text>
@@ -509,11 +573,7 @@ export default class EditProfile extends Component {
                   <Text style={{fontSize:14, fontFamily:'WorkSans-Bold', color:'rgb(83,83,83)'}}>UserName:</Text>
                   <TextInput style={{fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(83,83,83)', flex:1}} value={this.state.username} onChangeText={(text) => this.setState({username:text})} />
                 </View>
-                <View style={{flexDirection:'row', alignItems:'center', margin:10}}>
-                  <TouchableOpacity onPress={() => this.setState({isCheckedUsername:!this.state.isCheckedUsername})} ><Image style={{width:15, height:15, resizeMode:'cover'}} source={this.state.isCheckedUsername? require('../assets/images/checked.png'):require('../assets/images/unchecked.png')}/></TouchableOpacity>
-                  <View style={{width:10}}/>
-                  <Text style={{flex:1, fontSize:10}}>Include on Profile</Text>
-                </View>
+                <View style={{height:20}}/>
                 <View style={{flexDirection:'row', height:40, backgroundColor:'rgb(245,245,245)', paddingLeft:20, alignItems:'center'}}>
                   <Text style={{fontSize:14, fontFamily:'WorkSans-Bold', color:'rgb(83,83,83)'}}>FirstName:</Text>
                   <TextInput style={{fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(83,83,83)', flex:1}} value={this.state.firstname} onChangeText={(text) => this.setState({firstname:text})} />
@@ -523,7 +583,11 @@ export default class EditProfile extends Component {
                   <Text style={{fontSize:14, fontFamily:'WorkSans-Bold', color:'rgb(83,83,83)'}}>LastName:</Text>
                   <TextInput style={{fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(83,83,83)', flex:1}} value={this.state.lastname} onChangeText={(text) => this.setState({lastname:text})} />
                 </View>
-                <View style={{height:20}}/>
+                <View style={{flexDirection:'row', alignItems:'center', margin:10}}>
+                  <TouchableOpacity onPress={() => this.setState({isCheckedUsername:!this.state.isCheckedUsername})} ><Image style={{width:15, height:15, resizeMode:'cover'}} source={this.state.isCheckedUsername? require('../assets/images/checked.png'):require('../assets/images/unchecked.png')}/></TouchableOpacity>
+                  <View style={{width:10}}/>
+                  <Text style={{flex:1, fontSize:10}}>Include on Profile</Text>
+                </View>
                 <View style={{backgroundColor:'rgb(245,245,245)', height:40, flexDirection:'row'}}>
                   <TouchableOpacity style={{flex:1, height:40}} onPress={() => this.setState({modalVisible:true})}>
                     <View style={{flexDirection:'row', height:40, marginLeft:20, marginRight:20, alignItems:'center'}}>
@@ -606,7 +670,7 @@ export default class EditProfile extends Component {
                 <View style={{backgroundColor:'rgb(245,245,245)', height:40, flexDirection:'row'}}>
                   <TouchableOpacity style={{flex:1, height:40}} onPress={() => this.setState({genderVisible:!this.state.genderVisible})}>
                     <View style={{flexDirection:'row', height:40, marginLeft:20, marginRight:20, alignItems:'center'}}>
-                      <Text style={{fontSize:14, fontFamily:'WorkSans-Bold', color:'rgb(83,83,83)'}}>Profile Type:</Text>
+                      <Text style={{fontSize:14, fontFamily:'WorkSans-Bold', color:'rgb(83,83,83)'}}>Gender:</Text>
                       <Text style={{fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(83,83,83)', flex:1}}>{this.state.selectedGender}</Text>
                       <Image source={require('../assets/images/rArrow_down.png')} style={{width:15, height:7, resizeMode:'cover'}} />
                     </View>
@@ -617,6 +681,8 @@ export default class EditProfile extends Component {
                   <Picker selectedValue = {this.state.selectedGender} onValueChange={this.GenderSelect}>
                     <Picker.Item label = "Male" value = "male" />
                     <Picker.Item label = "Female" value = "female" />
+                    <Picker.Item label = "Business" value = "business" />
+                    <Picker.Item label = "Other" value = "other" />
                   </Picker>
                 </View>
                 :
@@ -628,7 +694,7 @@ export default class EditProfile extends Component {
                 </View>
                 <Text style={{fontSize:14, fontFamily:'WorkSans-Bold', color:'rgb(83,83,83)', margin:10}}>Genre:</Text>
                 <View style={{flexDirection:'row', padding:10, backgroundColor:'rgb(245,245,245)'}}>
-                  <TextInput editable={false} onKeyPress={this.onKeyPress} multiline={true} style={{flex:1, height:100, fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(209,16,56)'}} value={this.state.genresString}></TextInput>
+                  <TextInput onKeyPress={this.onKeyPress} multiline={true} style={{flex:1, height:100, fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(209,16,56)'}} value={this.state.genresString}></TextInput>
                 </View>
                 <Autocomplete
                   autoCapitalize="none"

@@ -28,14 +28,9 @@ export const uploadAsByteArray = async (uid,pickerResultAsByteArray, progressCal
           console.log("_uploadAsByteArray ", uploadTask.snapshot.downloadURL)
     
           // save a reference to the image for listing purposes
-          var ref = firebase.database().ref('profile').child(uid);
-          ref.set({
-            'URL': downloadURL,
-            //'thumb': _imageData['thumb'],
-            'name': name,
-            //'coords': _imageData['coords'],
-            'owner': firebase.auth().currentUser && firebase.auth().currentUser.uid,
-            'when': new Date().getTime()
+          var ref = firebase.database().ref('users').child(uid);
+          ref.update({
+            'imgURL': downloadURL,
           })
         });
     

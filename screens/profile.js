@@ -8,13 +8,12 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from 'react-native'
 import Swiper from 'react-native-swiper'
 import Drawer from 'react-native-drawer'
 import _ from 'lodash'
-
 import * as firebase from 'firebase'
-
 import Slider from 'react-native-multislider'
 import CircleImage from '../components/circleImage'
 import Autocomplete from 'react-native-autocomplete-input'
@@ -22,21 +21,26 @@ import Autocomplete from 'react-native-autocomplete-input'
 export default class Profile extends Component {
 
   state = {
-    ageRangeValues: this.props.user.ageRange,
-    distanceValue: [this.props.user.distance],
-    showMen: this.props.user.showMen,
-    showWomen: this.props.user.showWomen,
+    ageRangeValues: this.props.navigation.state.params.user.ageRange,
+    distanceValue: [this.props.navigation.state.params.user.distance],
+    showMen: this.props.navigation.state.params.user.showMen,
+    showWomen: this.props.navigation.state.params.user.showWomen,
     people: require('../components/profile.json'),
     media: require('../components/media.json'),
-    distance:[40],
-    unit:'Km',
-    want:'People',
+    distance:this.props.navigation.state.params.user.unit == 'Km' ? Number((this.props.navigation.state.params.user.distance/805*100).toFixed(0))
+    :Number((this.props.navigation.state.params.user.distance/500*100)),
+    unit:this.props.navigation.state.params.user.unit,
+    want:this.props.navigation.state.params.user.type.name == 'Fan' ? 'Media':'People',
     showAllDefault:true,
-    showIndependents:false,
-    showCompanies:false,
+    showIndie:false,
+    showSigned:false,
+    showStaff:false,
+    showOwner:false,
     genderAll:true,
     genderMale:false,
     genderFemale:false,
+    genderBusiness:false,
+    genderOther:false,
     controlAll:true,
     controlCustom:false,
     controlRecent:false,
@@ -47,14 +51,18 @@ export default class Profile extends Component {
     skillString:'',
   }
 
+  static navigationOptions = {
+    header: null,
+  }
+
   updateUser = (key, value) => {
-    const {uid} = this.props.user
+    const {uid} = this.props.navigation.state.params.user
     firebase.database().ref('users').child(uid)
       .update({[key]:value})
   }
 
   selectedAll = (item) => {
-    console.log(item)
+    // console.log(item)
     item.allselected = !item.allselected
     // if(item.selectedAll) {
     //   item.selected = true
@@ -108,7 +116,7 @@ export default class Profile extends Component {
 
       for(var i=0;i<arr.length;i++) {
         var selectAll = arr[i].allselected
-        console.log(arr[i])
+        // console.log(arr[i])
         for(var j=0;j<arr[i].list.length;i++) {
           if(arr[i].list[j].selected != selectAll){
             selectAll = !selectAll
@@ -128,14 +136,25 @@ export default class Profile extends Component {
     
   }
 
+  goBack =() => {
+    this.props.navigation.goBack()
+    // const getProfiles = this.props.navigation.state.params.getProfiles;
+    // getProfiles()
+    
+  }
+
   selectedCatetory = (item) => {
 
-    item.selected = !item.selected
+    // item.selected = !item.selected
 
     if(this.state.want == 'Media') {
       var newArray = this.state.media
+      for(var i=0; i<newArray.length; i++) {
+        newArray[i].selected = false
+      }
       
-      newArray[item.id] = item
+      newArray[item.id].selected = !item.selected
+      // console.log(newArray)
       
       this.setState({
         media:newArray
@@ -143,9 +162,11 @@ export default class Profile extends Component {
     }
     else {
       var newArray = this.state.people
-      
-      newArray[item.id] = item
-      
+      for(var i=0; i<newArray.length; i++) {
+        newArray[i].selected = false
+      }
+      newArray[item.id].selected = !item.selected
+      // console.log(newArray)
       this.setState({
         people:newArray
       })
@@ -271,47 +292,77 @@ export default class Profile extends Component {
     
   }
 
+  changeUnit = (unit) => {
+    if(this.state.unit == unit) return
+    if(unit == 'Km'){
+      this.setState({
+        unit:unit,
+      })
+      this.updateUser('unit', 'Km')
+      this.updateUser('distance', Number((this.state.distance*8.05).toFixed(0)))
+    } else {
+      this.setState({
+        unit:unit,
+      })
+      this.updateUser('unit', 'Mi')
+      this.updateUser('distance', this.state.distance*5)
+    }
+  }
 
   render() {
-    const {first_name, work, id} = this.props.user
+    const {first_name, work, id} = this.props.navigation.state.params.user
     const {ageRangeValues, distanceValue, showMen, showWomen, distance, unit, want} = this.state
     const bio = (work && work[0] && work[0].position) ? work[0].position.name : null
     const { query } = this.state;
     const skills = this.findSkill(query);
+    
+    // console.log(this.state.distance)
     return (
       <View style={styles.container}>
+        <View style={{flexDirection: 'row', height:70, backgroundColor: 'rgb(83, 83, 83)'}}>
+          <TouchableOpacity onPress={this.goBack} style={{alignItems:'center', width:50, height:50, marginTop:20, justifyContent:'center'}}>
+              <Image source={require('../assets/images/back.png')} style={{resizeMode:'contain', width:20, height:10}}/>
+          </TouchableOpacity> 
+          
+          <View style={{flex:1, height:50, marginTop:20, alignItems:'center', justifyContent:'center'}}>
+              <Text style={{fontSize: 20, color: 'white', fontFamily:'AbrilFatface-Regular'}}> Filter </Text>
+          </View>
+          <View style={{width:50, height:50}}/>
+        </View>
         <ScrollView style={{flex:1}}>
-          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Swipping in: </Text>
+          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Swiping in: </Text>
           <Text style={{fontFamily:'WorkSans-Light', fontSize:14, lineHeight:20, marginLeft:20, marginTop:10, color:'rgb(209,16,56)'}}> My Current Location </Text>
           <View style={{height:1, marginTop:15, flexDirection:'row', marginLeft:20, marginRight:20}}>
             <View style={{height:1, flex:1, backgroundColor:'rgb(242,242,242)'}}/>
           </View>
           <View style={{flexDirection:'row', alignItems:'center'}}>
             <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30,marginTop:15, marginLeft:20, color:'rgb(74,74,74)'}}>Search Distance:</Text>
-            <Text style={{fontFamily:'WorkSans-SemiBold', fontSize:14, lineHeight:24, marginTop:21, color:'rgb(213,213,213)'}}> {distance}{unit}</Text>
+            <Text style={{fontFamily:'WorkSans-SemiBold', fontSize:14, lineHeight:24, marginTop:21, color:'rgb(213,213,213)'}}> {this.state.unit == 'Mi'?(distance*5):Number((distance*8.05).toFixed(0))}{unit}</Text>
           </View>
           <Slider
-            min={1}
+            min={0}
             max={100}
-            values={distance}
-            onValuesChange={val => this.setState({distance:val})}
+            values={[distance]}
+            onValuesChange={val => this.setState({distance:val[0]})}
+            onValuesChangeFinish={val => this.updateUser('distance', this.state.unit == 'Mi'?(distance*5):Number((distance*8.05).toFixed(0)))}
             defaultTrackColor='red'
             rangeColor={'pink'}
             leftThumbColor={'blue'}
           />
+
           <View style={{height:1, marginTop:20, flexDirection:'row', marginLeft:20, marginRight:20}}>
             <View style={{height:1, flex:1, backgroundColor:'rgb(242,242,242)'}}/>
           </View>
           <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Search Distance in: </Text>
           <View style={{flexDirection:'row', height:40, justifyContent:'center', alignItems:'center'}}>
-            <TouchableOpacity onPress={() => this.setState({unit:'Km'})}>
+            <TouchableOpacity onPress={() => this.changeUnit('Km')}>
               {
                 this.state.unit != 'Km' ?
                 <Text style={{fontFamily:'WorkSans-Light', textAlign:'center', textAlignVertical:'center', fontSize:14, width:100, lineHeight:20, color:'rgb(17,17,17)'}}>Km</Text>
                 : <Text style={{fontFamily:'WorkSans-SemiBold', textAlign:'center', textAlignVertical:'center', borderBottomColor:'rgb(209,16,56)', borderBottomWidth:1, fontSize:14, width:100, lineHeight:20, color:'rgb(209,16,56)'}}>Km</Text>
               }
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.setState({unit:'Mi'})}>
+            <TouchableOpacity onPress={() => this.changeUnit('Mi')}>
               {
                 this.state.unit == 'Mi'?
                 <Text style={{fontFamily:'WorkSans-SemiBold', textAlign:'center', textAlignVertical:'center', borderBottomColor:'rgb(209,16,56)', borderBottomWidth:1, fontSize:14, width:100, lineHeight:20, color:'rgb(209,16,56)'}}>Mi</Text>
@@ -322,9 +373,11 @@ export default class Profile extends Component {
           <View style={{height:1, flexDirection:'row', marginLeft:20, marginRight:20}}>
             <View style={{height:1, flex:1, backgroundColor:'rgb(242,242,242)'}}/>
           </View>
-          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> I Want a: </Text>
+          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Looking for: </Text>
           <View style={{flexDirection:'row', height:40, justifyContent:'center', alignItems:'center'}}>
-            <TouchableOpacity onPress={() => this.setState({want:'People'})}>
+            {
+              this.props.navigation.state.params.user.type.name == 'Fan' ? <View/>:
+              <TouchableOpacity onPress={() => this.setState({want:'People'})}>
               {
                 this.state.want == 'People'?
                 <Text style={{fontFamily:'WorkSans-SemiBold', textAlign:'center', textAlignVertical:'center', borderBottomColor:'rgb(209,16,56)', borderBottomWidth:1, fontSize:14, width:100, lineHeight:20, color:'rgb(209,16,56)'}}>People</Text>
@@ -332,6 +385,8 @@ export default class Profile extends Component {
               }
               
             </TouchableOpacity>
+            }
+            
             <TouchableOpacity onPress={() => this.setState({want:'Media'})}>
               {
                 this.state.want == 'Media'?
@@ -339,11 +394,11 @@ export default class Profile extends Component {
                 : <Text style={{fontFamily:'WorkSans-Light', textAlign:'center', textAlignVertical:'center', fontSize:14, width:100, lineHeight:20, color:'rgb(17,17,17)'}}>Media</Text>                
               }
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.setState({want:'Things'})}>
+            <TouchableOpacity onPress={() => Alert.alert('Warning','Oops, we haven’t finished this yet, we’ll let you know as soon as we launch this feature')}>
               {
                 this.state.want == 'Things'?
-                <Text style={{fontFamily:'WorkSans-SemiBold', textAlign:'center', textAlignVertical:'center', borderBottomColor:'rgb(209,16,56)', borderBottomWidth:1, fontSize:14, width:100, lineHeight:20, color:'rgb(209,16,56)'}}>Things</Text>
-                : <Text style={{fontFamily:'WorkSans-Light', textAlign:'center', textAlignVertical:'center', fontSize:14, width:100, lineHeight:20, color:'rgb(17,17,17)'}}>Things</Text>                                
+                <Text style={{fontFamily:'WorkSans-SemiBold', textAlign:'center', textAlignVertical:'center', borderBottomColor:'rgb(209,16,56)', borderBottomWidth:1, fontSize:14, width:100, lineHeight:20, color:'rgb(209,16,56)'}}>{this.props.navigation.state.params.user.type.name == 'Fan' ? 'Events':'Classifieds'}</Text>
+                : <Text style={{fontFamily:'WorkSans-Light', textAlign:'center', textAlignVertical:'center', fontSize:14, width:100, lineHeight:20, color:'rgb(17,17,17)'}}>{this.props.navigation.state.params.user.type.name == 'Fan' ? 'Events':'Classifieds'}</Text>                                
               }
               
             </TouchableOpacity>
@@ -569,9 +624,9 @@ export default class Profile extends Component {
             </View>
           }
 
-          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Show Me: </Text>
+          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Profile Status: </Text>
           <View>
-            <TouchableOpacity onPress={() => this.setState({showAllDefault:true, showIndependents:false, showCompanies:false})}>
+            <TouchableOpacity onPress={() => this.setState({showAllDefault:true, showIndie:false, showSigned:false, showStaff:false, showOwner:false})}>
               <View style={styles.container1}>
                 {
                   this.state.showAllDefault ? (
@@ -589,10 +644,10 @@ export default class Profile extends Component {
             </TouchableOpacity>
           </View>
           <View>
-            <TouchableOpacity onPress={() => this.setState({showAllDefault:false, showIndependents:true, showCompanies:false})}>
+            <TouchableOpacity onPress={() => this.setState({showAllDefault:false, showIndie:true, showSigned:false, showStaff:false, showOwner:false})}>
               <View style={styles.container1}>
                 {
-                  this.state.showIndependents ? (
+                  this.state.showIndie ? (
                       <Image source={require('../assets/images/checked.png')} style={{width:16, height:16}}/>
                     ) : (
                       <Image source={require('../assets/images/unchecked.png')} style={{width:16, height:16}}/>
@@ -600,17 +655,17 @@ export default class Profile extends Component {
                 }
                 {
                   <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)', paddingLeft:35}}>
-                   Independents
+                   Indie
                   </Text>
                 }          
               </View>
             </TouchableOpacity>
           </View>
           <View>
-            <TouchableOpacity onPress={() => this.setState({showAllDefault:false, showIndependents:false, showCompanies:true})}>
+            <TouchableOpacity onPress={() => this.setState({showAllDefault:false, showIndie:false, showSigned:true, showStaff:false, showOwner:false})}>
               <View style={styles.container1}>
                 {
-                  this.state.showCompanies ? (
+                  this.state.showSigned ? (
                       <Image source={require('../assets/images/checked.png')} style={{width:16, height:16}}/>
                     ) : (
                       <Image source={require('../assets/images/unchecked.png')} style={{width:16, height:16}}/>
@@ -618,7 +673,43 @@ export default class Profile extends Component {
                 }
                 {
                   <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)', paddingLeft:35}}>
-                    Companies
+                   Signed
+                  </Text>
+                }          
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity onPress={() => this.setState({showAllDefault:false, showIndie:false, showSigned:false, showStaff:true, showOwner:false})}>
+              <View style={styles.container1}>
+                {
+                  this.state.showStaff ? (
+                      <Image source={require('../assets/images/checked.png')} style={{width:16, height:16}}/>
+                    ) : (
+                      <Image source={require('../assets/images/unchecked.png')} style={{width:16, height:16}}/>
+                    )
+                }
+                {
+                  <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)', paddingLeft:35}}>
+                   Staff
+                  </Text>
+                }          
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity onPress={() => this.setState({showAllDefault:false, showIndie:false, showSigned:false, showStaff:false, showOwner:true})}>
+              <View style={styles.container1}>
+                {
+                  this.state.showOwner ? (
+                      <Image source={require('../assets/images/checked.png')} style={{width:16, height:16}}/>
+                    ) : (
+                      <Image source={require('../assets/images/unchecked.png')} style={{width:16, height:16}}/>
+                    )
+                }
+                {
+                  <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)', paddingLeft:35}}>
+                   Owner
                   </Text>
                 }          
               </View>
@@ -629,7 +720,7 @@ export default class Profile extends Component {
           </View>
           <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Gender: </Text>
           <View>
-            <TouchableOpacity onPress={() => this.setState({genderAll:true, genderFemale:false, genderMale:false})}>
+            <TouchableOpacity onPress={() => this.setState({genderAll:true, genderFemale:false, genderMale:false, genderBusiness:false, genderOther:false})}>
               <View style={styles.container1}>
                 {
                   this.state.genderAll ? (
@@ -647,7 +738,7 @@ export default class Profile extends Component {
             </TouchableOpacity>
           </View>
           <View>
-            <TouchableOpacity onPress={() => this.setState({genderAll:false, genderFemale:true, genderMale:false})}>
+            <TouchableOpacity onPress={() => this.setState({genderAll:false, genderFemale:true, genderMale:false, genderBusiness:false, genderOther:false})}>
               <View style={styles.container1}>
                 {
                   this.state.genderFemale ? (
@@ -665,7 +756,7 @@ export default class Profile extends Component {
             </TouchableOpacity>
           </View>
           <View>
-            <TouchableOpacity onPress={() => this.setState({genderAll:false, genderFemale:false, genderMale:true})}>
+            <TouchableOpacity onPress={() => this.setState({genderAll:false, genderFemale:false, genderMale:true, genderBusiness:false, genderOther:false})}>
               <View style={styles.container1}>
                 {
                   this.state.genderMale ? (
@@ -682,11 +773,55 @@ export default class Profile extends Component {
               </View>
             </TouchableOpacity>
           </View>
-          <View style={{height:1, flexDirection:'row', marginLeft:20, marginRight:20}}>
-            <View style={{height:1, flex:1, backgroundColor:'rgb(242,242,242)'}}/>
+          <View>
+            <TouchableOpacity onPress={() => this.setState({genderAll:false, genderFemale:false, genderMale:false, genderBusiness:true, genderOther:false})}>
+              <View style={styles.container1}>
+                {
+                  this.state.genderBusiness ? (
+                      <Image source={require('../assets/images/checked.png')} style={{width:16, height:16}}/>
+                    ) : (
+                      <Image source={require('../assets/images/unchecked.png')} style={{width:16, height:16}}/>
+                    )
+                }
+                {
+                  <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)', paddingLeft:35}}>
+                    Business
+                  </Text>
+                }          
+              </View>
+            </TouchableOpacity>
           </View>
-          <Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Skills & Services: </Text>
-          <View style={{margin:20}}>
+          <View>
+            <TouchableOpacity onPress={() => this.setState({genderAll:false, genderFemale:false, genderMale:false, genderBusiness:false, genderOther:true})}>
+              <View style={styles.container1}>
+                {
+                  this.state.genderOther ? (
+                      <Image source={require('../assets/images/checked.png')} style={{width:16, height:16}}/>
+                    ) : (
+                      <Image source={require('../assets/images/unchecked.png')} style={{width:16, height:16}}/>
+                    )
+                }
+                {
+                  <Text style={{fontFamily:'WorkSans-Light', fontSize:14, color:'rgb(17,17,17)', paddingLeft:35}}>
+                    Other
+                  </Text>
+                }          
+              </View>
+            </TouchableOpacity>
+          </View>
+          {
+            this.state.want == 'Media' || this.props.navigation.state.params.user.type.name=='Fan'?<View/>:
+            <View style={{height:1, flexDirection:'row', marginLeft:20, marginRight:20}}>
+              <View style={{height:1, flex:1, backgroundColor:'rgb(242,242,242)'}}/>
+            </View>
+          }
+          
+          {
+            this.state.want == 'Media' || this.props.navigation.state.params.user.type.name=='Fan'?<View/>:<Text style={{fontFamily:'AbrilFatface-Regular', fontSize:20, lineHeight:30, marginLeft:20, marginTop:20, color:'rgb(74,74,74)'}}> Skills & Services: </Text>
+          }
+          {
+            this.state.want == 'Media' || this.props.navigation.state.params.user.type.name=='Fan'?<View/>
+            :<View style={{margin:20}}>
             <Autocomplete
               autoCapitalize="none"
               autoCorrect={false}
@@ -705,6 +840,8 @@ export default class Profile extends Component {
               )}
             />
           </View>
+          }
+          
           <View style={{flexDirection:'row', margin:20, backgroundColor:'transparent'}}>
             <TextInput editable={false} onKeyPress={this.onKeyPress} multiline={true} style={{flex:1, fontSize:14, fontFamily:'WorkSans-Light', color:'rgb(209,16,56)'}} value={this.state.skillString}></TextInput>
           </View>
@@ -823,7 +960,6 @@ const styles = StyleSheet.create({
   container: {
     flex:1,
     backgroundColor:'white',
-    marginBottom:50,
   },
   profile: {
     flex:1,
