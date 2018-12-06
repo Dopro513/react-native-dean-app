@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "muebox",
+    "description": "No description",
+    "slug": "muebox",
+    "privacy": "public",
+    "sdkVersion": "19.0.0",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "primaryColor": "#cccccc",
+    "icon": "./assets/icons/app_icon.png",
+    "notification": {
+      "icon": "./assets/icons/noti_icon.png",
+      "color": "#000000"
+    },
+    "loading": {
+      "hideExponentText": false,
+      "backgroundImage": "./assets/images/splashscreen.png"
+    },
+    "packagerOpts": {
+      "assetExts": ["ttf"]
+    },
+    "ios": {
+      "supportsTablet": false
+    }
+  }
+}

@@ -1,0 +1,229 @@
+[
+    {
+        "id":0,
+        "name":"Management",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"A&R Director", "selected":false},
+            {"id":1, "name":"A&R Manager", "selected":false},
+            {"id":2, "name":"A&R Scout", "selected":false},
+            {"id":3, "name":"Account Executive", "selected":false},
+            {"id":4, "name":"Account Manager", "selected":false},
+            {"id":5, "name":"Accountant (Qualified)", "selected":false},
+            {"id":6, "name":"Accounts / Finance Assistant", "selected":false},
+            {"id":7, "name":"Administration Assistant", "selected":false},
+            {"id":8, "name":"Administrator", "selected":false},
+            {"id":9, "name":"Animateur", "selected":false},
+            {"id":10, "name":"Artist Booker/Booking Agent", "selected":false},
+            {"id":11, "name":"Artist Management Assistant", "selected":false},
+            {"id":12, "name":"Artist Manager", "selected":false},
+            {"id":13, "name":"Assistant Director, Music Video", "selected":false},
+            {"id":14, "name":"Assistant Editor", "selected":false},
+            {"id":15, "name":"Booking Agent ", "selected":false},
+            {"id":16, "name":"Brand / Product Manager", "selected":false},
+            {"id":17, "name":"Brand / Product Manager (Assistant)", "selected":false},
+            {"id":18, "name":"Record Label ", "selected":false},
+            {"id":19, "name":"Roadie", "selected":false},
+            {"id":20, "name":"Studio Manager", "selected":false},
+            {"id":21, "name":"Teacher - Instrumental", "selected":false}
+        ]
+    },
+    {
+        "id":1,
+        "name":"Music Artist",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Accompanist", "selected":false},
+            {"id":1, "name":"Backing Vocalist", "selected":false},
+            {"id":2, "name":"Copyist", "selected":false},
+            {"id":3, "name":"DJ", "selected":false},
+            {"id":4, "name":"Editor", "selected":false},
+            {"id":5, "name":"Session Singer", "selected":false},
+            {"id":6, "name":"Singer / Vocalist", "selected":false},
+            {"id":7, "name":"Song Writer", "selected":false}
+        ]
+    },
+    {
+        "id":2,
+        "name":"Musician",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Copyist", "selected":false},
+            {"id":1, "name":"Editor", "selected":false},
+            {"id":2, "name":"Song Writer", "selected":false},
+            {"id":3, "name":"Accordion Player", "selected":false},
+            {"id":4, "name":"Arranger", "selected":false},
+            {"id":6, "name":"Backline Technician", "selected":false},
+            {"id":7, "name":"Conductor", "selected":false},
+            {"id":8, "name":"Engineer", "selected":false},
+            {"id":9, "name":"Music Co-ordinator", "selected":false},
+            {"id":10, "name":"Musician (session)", "selected":false},
+            {"id":11, "name":"Orchestra Manager", "selected":false},
+            {"id":12, "name":"Producer", "selected":false},
+            {"id":13, "name":"Sound Designer", "selected":false},
+            {"id":14, "name":"Sound Mixer/Mixing Engineer", "selected":false}
+        ]
+    },
+    {
+        "id":3,
+        "name":"Music Production",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Copyist", "selected":false},
+            {"id":1, "name":"Editor", "selected":false},
+            {"id":2, "name":"Song Writer", "selected":false},
+            {"id":3, "name":"Conductor", "selected":false},
+            {"id":4, "name":"Engineer", "selected":false},
+            {"id":5, "name":"Music Co-ordinator", "selected":false},
+            {"id":6, "name":"Orchestra Manager", "selected":false},
+            {"id":7, "name":"Producer", "selected":false},
+            {"id":8, "name":"Sound Designer", "selected":false},
+            {"id":9, "name":"Sound Mixer/Mixing Engineer", "selected":false},
+            {"id":10, "name":"Studio Manager", "selected":false},
+            {"id":11, "name":"Assistant Engineer", "selected":false},
+            {"id":12, "name":"Composer", "selected":false},
+            {"id":13, "name":"Mastering Engineer", "selected":false},
+            {"id":14, "name":"Sound Engineer", "selected":false},
+            {"id":15, "name":"Technician", "selected":false}
+        ]
+    },
+    {
+        "id":4,
+        "name":"Visual Arts",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Music Co-ordinator", "selected":false},
+            {"id":1, "name":"Animator", "selected":false},
+            {"id":2, "name":"Graphic design", "selected":false},
+            {"id":3, "name":"Painters", "selected":false},
+            {"id":4, "name":"Photographer", "selected":false},
+            {"id":5, "name":"Sculpter", "selected":false},
+            {"id":6, "name":"Video editing", "selected":false}
+        ]
+    },
+    {
+        "id":5,
+        "name":"Styling",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Barber", "selected":false},
+            {"id":1, "name":"Fashion Designer", "selected":false},
+            {"id":2, "name":"Hair dresser", "selected":false},
+            {"id":3, "name":"Makeup artist", "selected":false},
+            {"id":4, "name":"Stylist", "selected":false}
+        ]
+    },
+    {
+        "id":6,
+        "name":"Marketing/Publicity",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Editor", "selected":false},
+            {"id":1, "name":"Blogger", "selected":false},
+            {"id":2, "name":"Box Office Assistant", "selected":false},
+            {"id":3, "name":"Box Office Manager", "selected":false},
+            {"id":4, "name":"Content strategist", "selected":false},
+            {"id":5, "name":"Content writer", "selected":false},
+            {"id":6, "name":"Journalist", "selected":false},
+            {"id":7, "name":"Radio Presentor", "selected":false},
+            {"id":8, "name":"Vlogger", "selected":false},
+            {"id":9, "name":"Writer", "selected":false}
+        ]
+    },
+    {
+        "id":7,
+        "name":"Events",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Conductor", "selected":false},
+            {"id":1, "name":"Roadie", "selected":false},
+            {"id":2, "name":"Club Manager", "selected":false},
+            {"id":3, "name":"Concert Assistant", "selected":false},
+            {"id":4, "name":"Concert Manager", "selected":false},
+            {"id":5, "name":"Event Manager", "selected":false},
+            {"id":6, "name":"MC /Event Host", "selected":false},
+            {"id":7, "name":"Promoters", "selected":false},
+            {"id":8, "name":"Venue", "selected":false}
+        ]
+    },
+    {
+        "id":8,
+        "name":"Live Production",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Conductor", "selected":false},
+            {"id":1, "name":"Roadie", "selected":false},
+            {"id":2, "name":"Engineer", "selected":false},
+            {"id":3, "name":"Orchestra Manager", "selected":false},
+            {"id":4, "name":"Technician", "selected":false},
+            {"id":5, "name":"Backline Technician", "selected":false},
+            {"id":6, "name":"Lighting Technician", "selected":false},
+            {"id":7, "name":"Sound & PA", "selected":false}
+        ]
+    },
+    {
+        "id":9,
+        "name":"Business",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Dance Studio", "selected":false},
+            {"id":1, "name":"Photograhy Studio", "selected":false},
+            {"id":2, "name":"Recording Studio", "selected":false}
+        ]
+    },
+    {
+        "id":10,
+        "name":"Performers",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Actor", "selected":false},
+            {"id":1, "name":"Choreographer", "selected":false},
+            {"id":2, "name":"Dancers", "selected":false}
+        ]
+    },
+    {
+        "id":11,
+        "name":"Technology",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Audio Programmer", "selected":false},
+            {"id":1, "name":"Music Technologist", "selected":false}
+        ]
+    },
+    {
+        "id":12,
+        "name":"Support",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Roadie", "selected":false},
+            {"id":1, "name":"Engineer", "selected":false},
+            {"id":2, "name":"Technician", "selected":false},
+            {"id":3, "name":"Editor", "selected":false},
+            {"id":4, "name":"Box Office Assistant", "selected":false},
+            {"id":5, "name":"Box Office Manager", "selected":false},
+            {"id":6, "name":"Sound Designer", "selected":false},
+            {"id":7, "name":"Studio Manager", "selected":false},
+            {"id":8, "name":"Teacher - Instrumental", "selected":false},
+            {"id":9, "name":"Business Consultant", "selected":false},
+            {"id":10, "name":"Business Development Assistant", "selected":false},
+            {"id":11, "name":"Business Development Manager", "selected":false},
+            {"id":12, "name":"Catalogue Assistant", "selected":false},
+            {"id":13, "name":"Catalogue Manager", "selected":false},
+            {"id":14, "name":"Community Music Worker", "selected":false},
+            {"id":15, "name":"Digital Manager", "selected":false}
+        ]
+    }
+]

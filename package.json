@@ -1,0 +1,45 @@
+{
+  "name": "muebox",
+  "version": "0.0.0",
+  "description": "Hello Expo!",
+  "author": null,
+  "license": "",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "test": "node ./node_modules/jest/bin/jest.js --watch"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "@expo/samples": "^2.0.2",
+    "base-64": "^0.1.0",
+    "es6-promise": "^4.1.1",
+    "expo": "^19.0.0",
+    "fetch-everywhere": "^1.0.5",
+    "firebase": "^3.6.8",
+    "geofire": "^4.1.2",
+    "geolib": "^2.0.23",
+    "lodash": "^4.17.4",
+    "native-base": "^2.3.0",
+    "react": "16.0.0-alpha.12",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-19.0.0.tar.gz",
+    "react-native-autocomplete-input": "^3.3.1",
+    "react-native-collection": "^2.0.8",
+    "react-native-datepicker": "^1.6.0",
+    "react-native-dismiss-keyboard": "^1.0.0",
+    "react-native-drawer": "^2.3.0",
+    "react-native-gifted-chat": "^0.2.5",
+    "react-native-multislider": "0.0.14",
+    "react-native-popup-dialog": "^0.9.33",
+    "react-native-simple-emoji-picker": "^0.1.0",
+    "react-native-swiper": "^1.5.4",
+    "react-native-tabbar": "^1.0.0",
+    "react-navigation": "^1.0.0-beta.12"
+  },
+  "devDependencies": {
+    "babel-plugin-flow-react-proptypes": "^4.1.0",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.8",
+    "jest-expo": "^19.0.5"
+  }
+}

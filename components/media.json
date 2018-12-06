@@ -1,0 +1,47 @@
+[
+    {
+        "id":0,
+        "name":"Audio",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Albums /LPs", "selected":false},
+            {"id":1, "name":"EPs", "selected":false},
+            {"id":2, "name":"Instrumentals", "selected":false},
+            {"id":3, "name":"Loops", "selected":false},
+            {"id":4, "name":"Mixes", "selected":false},
+            {"id":5, "name":"Mixtapes", "selected":false},
+            {"id":6, "name":"Playlists", "selected":false},
+            {"id":7, "name":"Podcast", "selected":false},
+            {"id":8, "name":"Sets", "selected":false},
+            {"id":9, "name":"Songs", "selected":false},
+            {"id":10, "name":"Vocals", "selected":false}             
+        ]
+    },
+    {
+        "id":1,
+        "name":"Image",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Artwork", "selected":false},
+            {"id":1, "name":"Photos", "selected":false},
+            {"id":2, "name":"Projects", "selected":false}
+        ]
+    },
+    {
+        "id":2,
+        "name":"Video",
+        "allselected":false,
+        "selected":false,
+        "list":[
+            {"id":0, "name":"Documentaries", "selected":false},
+            {"id":1, "name":"Episodes", "selected":false},
+            {"id":2, "name":"Interviews", "selected":false},
+            {"id":3, "name":"Playlists", "selected":false},
+            {"id":4, "name":"Series", "selected":false},
+            {"id":5, "name":"Videos", "selected":false},
+            {"id":6, "name":"Vlogcasts", "selected":false}
+        ]
+    }
+]
